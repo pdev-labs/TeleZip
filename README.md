@@ -23,11 +23,14 @@ A highly efficient, cross-platform toolkit that automatically compresses subfold
 
 ## 🛠️ Installation & Setup
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/pdev-labs/TeleZip.git
-   cd TeleZip
-   ```
+1. **Download the Toolkit:**
+   Head to the [Releases](https://github.com/pdev-labs/TeleZip/releases/latest) page and download the zip file for your system:
+   - 🐧/🍏 **TeleZip-Unix.zip** (Linux, macOS, Android/Termux)
+   - 🪟 **TeleZip-Windows.zip** (Windows)
+   
+   Extract the zip file and open your terminal inside the extracted folder.
+   
+   *(Alternatively, you can `git clone https://github.com/pdev-labs/TeleZip.git`)*
 
 2. **Run the Initialization Wizard:**
    This wizard will ask for your Telegram credentials and safely store them in a local `.conf` file.

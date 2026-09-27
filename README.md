@@ -2,69 +2,49 @@
 
 A highly efficient, cross-platform toolkit that automatically compresses subfolders and uploads them directly to a Telegram channel or chat. By leveraging a local Dockerized Telegram Bot API server, this toolkit **bypasses the standard 50MB bot upload limit**, allowing you to seamlessly upload files up to **2GB** each!
 
-## ✨ Features
-- **🌍 100% Cross-Platform**: Includes native `.sh` scripts for Linux, macOS, and Android (via Termux), and native `.ps1` scripts for Windows PowerShell.
-- **🚀 2GB Upload Limit**: Automatically spins up a local Telegram API server via Docker to handle massive files natively.
-- **🪄 Setup Wizard**: An interactive `initialize` script sets up all your API keys and tokens in seconds so you never have to mess with config files manually.
-- **🤖 Auto-Detection**: Automatically detects newly generated zip folders and seamlessly queues them for upload with a confirmation prompt.
-- **📊 Live Progress Bar**: View real-time upload speeds and progress bars directly in your terminal.
-- **⚡ Dependency Auto-Installer**: Bash scripts will automatically install `zip` or `curl` via your package manager if they are missing.
+## ✨ New in TeleZip AIO (All-In-One)
+The new `telezip_aio.py` unifies all scripts into one incredibly powerful application with advanced features:
+- **🚄 Parallel Processing**: Zips multiple folders and uploads multiple files concurrently.
+- **💾 Pause & Resume**: Saves state automatically. If your internet cuts out, run it again and it skips what's already uploaded.
+- **🗑️ Auto-Cleanup**: Optionally deletes local zip files immediately after a successful upload to save disk space.
+- **🚫 Smart Exclusions**: Skip unnecessary folders (like `node_modules` or `.git`) on the fly.
+- **🔒 Password Encryption**: Securely lock your zip files with an AES password before uploading.
+- **📝 Automatic Captions & Notifications**: Adds beautiful captions to your uploads and sends a final text summary when the entire backup is complete!
+
+## 🌍 Legacy Support
+We still provide native `.sh` scripts for Linux/macOS/Termux and `.ps1` scripts for Windows PowerShell if you prefer individual lightweight tools without needing Python.
 
 ---
 
 ## 📋 Prerequisites
 
-1. **Docker / Docker Desktop**: Required to run the local Telegram API Server (for 2GB uploads).
-2. **Telegram API ID & Hash**: Get this for free from [my.telegram.org](https://my.telegram.org/).
-3. **Telegram Bot Token**: Get this from [@BotFather](https://t.me/BotFather) on Telegram.
-4. **Target Chat ID**: The `@username` of your channel or the numeric ID of your group.
+1. **Python 3**: Required to run the AIO master script.
+2. **Docker**: Required to run the local Telegram API Server (for 2GB uploads).
+3. **Telegram API ID & Hash**: Get this for free from [my.telegram.org](https://my.telegram.org/).
+4. **Telegram Bot Token**: Get this from [@BotFather](https://t.me/BotFather).
 
 ---
 
-## 🛠️ Installation & Setup
+## 🛠️ Installation & Usage
 
 1. **Download the Toolkit:**
-   Head to the [Releases](https://github.com/pdev-labs/TeleZip/releases/latest) page and download the zip file for your system:
-   - 🐧/🍏 **TeleZip-Unix.zip** (Linux, macOS, Android/Termux)
-   - 🪟 **TeleZip-Windows.zip** (Windows)
+   Head to the [Releases](https://github.com/pdev-labs/TeleZip/releases/latest) page and download `TeleZip-AIO.zip` (or the legacy packages for your system).
    
-   Extract the zip file and open your terminal inside the extracted folder.
-   
-   *(Alternatively, you can `git clone https://github.com/pdev-labs/TeleZip.git`)*
-
 2. **Run the Initialization Wizard:**
-   This wizard will ask for your Telegram credentials and safely store them in a local `.conf` file.
-   - **Linux / macOS / Termux:**
-     ```bash
-     chmod +x *.sh
-     ./initialize.sh
-     ```
-   - **Windows:**
-     ```powershell
-     .\initialize.ps1
-     ```
-   *(Note: The `.conf` file is ignored by git to protect your secrets).*
+   Run the setup wizard to securely save your API keys in a local `.conf` file:
+   - Linux/Mac: `./initialize.sh`
+   - Windows: `.\initialize.ps1`
 
----
+3. **Start the Local API Server:**
+   You must start the 2GB upload server before running the AIO script:
+   - Linux/Mac: `./start_bot_api.sh`
+   - Windows: `.\start_bot_api.ps1`
 
-## 🚀 Usage Workflow
-
-Using the toolkit is a simple 3-step process. 
-
-### Step 1: Compress Your Folders
-Run the zip script. It will ask for a parent directory, and it will zip every subfolder inside it individually.
-- **Linux/Mac**: `./auto_zip.sh`
-- **Windows**: `.\auto_zip.ps1`
-
-### Step 2: Start the Local API Server
-Start the Dockerized Telegram API server in the background to unlock 2GB uploads.
-- **Linux/Mac**: `./start_bot_api.sh`
-- **Windows**: `.\start_bot_api.ps1`
-
-### Step 3: Upload to Telegram
-Run the upload script. It will automatically detect your newly zipped folder and begin pushing the files to your Telegram chat with a live progress bar!
-- **Linux/Mac**: `./upload_telegram.sh`
-- **Windows**: `.\upload_telegram.ps1`
+4. **Run the AIO Backup:**
+   Launch the master script and follow the on-screen prompts to parallel zip, encrypt, and upload your entire directory automatically!
+   ```bash
+   python3 telezip_aio.py
+   ```
 
 ---
 

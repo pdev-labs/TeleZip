@@ -27,8 +27,15 @@ We still provide native `.sh` scripts for Linux/macOS/Termux and `.ps1` scripts 
 
 ## 🛠️ Installation & Usage
 
-1. **Download the Toolkit:**
+1. **Download or Clone the Toolkit:**
+   **Option A: Zip Download (Recommended)**
    Head to the [Releases](https://github.com/pdev-labs/TeleZip/releases/latest) page and download `TeleZip-AIO.zip` (or the legacy packages for your system).
+   
+   **Option B: Git Clone**
+   ```bash
+   git clone https://github.com/pdev-labs/TeleZip.git
+   cd TeleZip
+   ```
    
 2. **Run the Initialization Wizard:**
    Run the setup wizard to securely save your API keys in a local `.conf` file:

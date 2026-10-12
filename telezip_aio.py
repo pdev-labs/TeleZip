@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import time
+import threading
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib.request
@@ -11,6 +12,9 @@ from pathlib import Path
 # --- Configuration & State ---
 CONF_FILE = ".conf"
 STATE_FILE = ".telezip_state.json"
+# Telegram bot hard limit, even via a local Bot API server (mirrors legacy scripts)
+MAX_UPLOAD_BYTES = 2000 * 1024 * 1024
+REQUIRED_CONF_KEYS = ("bot_token", "chat_id")
 
 def load_config():
     if not os.path.exists(CONF_FILE):
@@ -63,8 +67,10 @@ def zip_folder(folder_path, output_dir, password=None, exclusions=None):
         return None
 
 # --- Feature 7, 9 & 4: Uploading with Captions & Cleanup ---
-def upload_file(zip_path, conf, state, delete_after):
-    if zip_path in state["uploaded"]:
+def upload_file(zip_path, conf, state, lock, delete_after):
+    with lock:
+        already_done = zip_path in state["uploaded"]
+    if already_done:
         print(f"⏩ Skipping {os.path.basename(zip_path)} (Already uploaded)")
         return True
 
@@ -89,8 +95,9 @@ def upload_file(zip_path, conf, state, delete_after):
     
     if http_code == "200":
         print(f"✅ Success: {filename}")
-        state["uploaded"].append(zip_path)
-        save_state(state)
+        with lock:
+            state["uploaded"].append(zip_path)
+            save_state(state)
         
         # Feature 4: Auto-cleanup
         if delete_after:
@@ -100,6 +107,25 @@ def upload_file(zip_path, conf, state, delete_after):
     else:
         print(f"❌ Failed: {filename} (HTTP {http_code})")
         return False
+
+def select_uploads(zip_paths):
+    """Capture each zip's size up front (auto-cleanup may delete files as
+    uploads complete, so sizes must never be read afterwards) and drop
+    missing files and anything at/above Telegram's 2000 MB per-file bot
+    hard limit. Returns a list of (path, size_bytes) tuples."""
+    sized = []
+    for zp in zip_paths:
+        try:
+            size = os.path.getsize(zp)
+        except OSError:
+            print(f"⚠️ Skipping {os.path.basename(zp)} (file not found)")
+            continue
+        if size >= MAX_UPLOAD_BYTES:
+            print(f"⚠️ Skipping {os.path.basename(zp)} ({size / (1024 * 1024):.2f} MB): "
+                  f"exceeds Telegram's 2000 MB per-file bot limit.")
+            continue
+        sized.append((zp, size))
+    return sized
 
 def send_summary(conf, total, size_mb, time_taken):
     print("📢 Sending final summary notification...")
@@ -120,6 +146,10 @@ def main():
     print("==================================================")
     
     conf = load_config()
+    for key in REQUIRED_CONF_KEYS:
+        if key not in conf:
+            print(f"Error: '{key}' missing in {CONF_FILE}. Please re-run the setup wizard.")
+            sys.exit(1)
     state = load_state()
     
     parent_dir = input("Enter the parent folder to backup: ").strip()
@@ -161,17 +191,27 @@ def main():
             if res:
                 zip_paths.append(res)
                 
+    # Size each zip up front (see select_uploads for why).
+    sized_paths = select_uploads(zip_paths)
+
     # Feature 9: Parallel Uploading
-    print(f"\n🚀 Uploading {len(zip_paths)} files in parallel...")
+    print(f"\n🚀 Uploading {len(sized_paths)} files in parallel...")
     success_count = 0
     total_size_uploaded = 0
-    
+
+    state_lock = threading.Lock()
     with ThreadPoolExecutor(max_workers=3) as executor:
-        futures = [executor.submit(upload_file, zp, conf, state, delete_after) for zp in zip_paths]
-        for future, zp in zip(as_completed(futures), zip_paths):
+        # Map each future to its own (path, size): as_completed() yields
+        # out of order, so results must never be zipped positionally.
+        future_map = {
+            executor.submit(upload_file, zp, conf, state, state_lock, delete_after): (zp, size)
+            for zp, size in sized_paths
+        }
+        for future in as_completed(future_map):
+            zp, size = future_map[future]
             if future.result():
                 success_count += 1
-                total_size_uploaded += os.path.getsize(zp)
+                total_size_uploaded += size
                 
     # Feature 8: Summary Notification
     total_mb = total_size_uploaded / (1024 * 1024)

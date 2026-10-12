@@ -5,6 +5,21 @@ follows [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- AIO auto-cleanup crash: sizes are now captured before uploading
+  (`select_uploads`), so answering `y` to delete-after-upload no longer
+  ends in `FileNotFoundError` with no summary message.
+- AIO summary accounting: each upload future is mapped to its own
+  `(path, size)` instead of positionally zipping `as_completed()` output
+  with the path list.
+- AIO resume-state race: all `state` reads/writes and saves are now
+  guarded by a lock across the upload threads.
+- AIO now validates that `.conf` contains `bot_token` and `chat_id` with
+  a friendly error instead of a `KeyError` traceback.
+- AIO now skips files at/above Telegram's 2000 MB per-file bot limit
+  with a warning, matching the legacy upload scripts.
+
 ## [v2.0.1] — 2026-10-12
 
 ### Fixed

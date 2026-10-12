@@ -156,7 +156,7 @@ Behavior worth knowing:
 - **Exclusions** are substring matches (`-x *node_modules*`), applied to every folder.
 - **Resume:** state lives in `.telezip_state.json` in the directory where you run the script. Interrupted run? Just run it again — uploaded entries are skipped. To re-upload everything, delete `.telezip_state.json` (and keep the zips, unless you enabled auto-cleanup).
 - **Summary message** is sent to your chat via `sendMessage` even if some uploads failed — compare its count against the per-file `✅/❌` lines.
-- **Size cap:** the legacy upload scripts refuse files ≥ 2000 MB (Telegram's hard bot limit even locally). The AIO script does not pre-check — oversize files will simply fail at the API with `❌ Failed … (HTTP …)` and can be retried after splitting.
+- **Size cap:** both AIO (`select_uploads`) and the legacy upload scripts skip files ≥ 2000 MB with a warning (Telegram's hard bot limit even locally). Split oversize folders and retry.
 
 ---
 

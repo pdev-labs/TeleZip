@@ -1,0 +1,23 @@
+---
+name: Feature request
+description: Suggest an idea for TeleZip
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes:
+      label: Problem
+      description: What can't you do today, or what hurts about the current flow?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposal
+      description: What should change? Note whether it affects AIO, legacy .sh, legacy .ps1, or all three.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Constraints
+      options:
+        - label: My proposal keeps stdlib-only Python (no new pip dependencies)
+        - label: My proposal keeps .sh / .ps1 parity where applicable

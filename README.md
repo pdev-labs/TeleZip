@@ -1,5 +1,9 @@
 # 📦 TeleZip
 
+[![GitHub release](https://img.shields.io/github/v/release/pdev-labs/TeleZip)](https://github.com/pdev-labs/TeleZip/releases/latest)
+[![CI](https://github.com/pdev-labs/TeleZip/actions/workflows/ci.yml/badge.svg)](https://github.com/pdev-labs/TeleZip/actions/workflows/ci.yml)
+[![License: GPL-3.0](https://img.shields.io/github/license/pdev-labs/TeleZip)](LICENSE)
+
 A cross-platform toolkit that compresses each subfolder of a parent directory into its own `.zip` and uploads the zips to a Telegram channel or chat.
 
 Telegram's public Bot API caps bot uploads at **50 MB**. TeleZip runs a **local Telegram Bot API server in Docker**, which raises the per-file limit to **2 GB**, and uploads through it — so large backups go through as normal `sendDocument` calls.

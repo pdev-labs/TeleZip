@@ -1,6 +1,16 @@
 # Configuration files containing secrets
 .conf
 
+# AIO resume state (runtime file, safe to delete)
+.telezip_state.json
+
+# Backup output folders created by auto_zip / AIO (<parent>/<parent>-zip)
+*-zip/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
 # OS generated files
 .DS_Store
 .DS_Store?

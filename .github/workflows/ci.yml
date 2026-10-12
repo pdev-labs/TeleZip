@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Python syntax check
+        run: python3 -m py_compile telezip_aio.py
+
+      - name: Shell syntax check
+        run: |
+          for f in initialize.sh auto_zip.sh start_bot_api.sh upload_telegram.sh; do
+            bash -n "$f" || exit 1
+          done
+
+      - name: No secrets tracked
+        run: |
+          if git ls-files | grep -qx '.conf'; then
+            echo 'FAIL: .conf is tracked by git'
+            exit 1
+          fi
+          if git ls-files | grep -qx '.telezip_state.json'; then
+            echo 'FAIL: .telezip_state.json is tracked by git'
+            exit 1
+          fi
+          echo 'OK: no secret/state files tracked'

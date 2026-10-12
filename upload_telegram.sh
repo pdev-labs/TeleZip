@@ -1,7 +1,12 @@
 #!/bin/bash
 
 # Read Bot Token and Chat ID from .conf if they exist
-CONF_FILE="/home/pdev/hdd/auto-zip/.conf"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONF_FILE="$SCRIPT_DIR/.conf"
+# Fallback to current directory (e.g. when sourced/copied elsewhere)
+if [ ! -f "$CONF_FILE" ]; then
+    CONF_FILE="./.conf"
+fi
 BOT_TOKEN=$(awk '/^bot_token/ {print $2}' "$CONF_FILE" 2>/dev/null)
 CHAT_ID=$(awk '/^chat_id/ {print $2}' "$CONF_FILE" 2>/dev/null)
 

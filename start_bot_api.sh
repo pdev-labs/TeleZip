@@ -1,11 +1,11 @@
 #!/bin/bash
 
-CONF_FILE=".conf"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONF_FILE="$SCRIPT_DIR/.conf"
 
-# Check if the .conf file exists
+# Check if the .conf file exists (also try cwd for backward compatibility)
 if [ ! -f "$CONF_FILE" ]; then
-    # Try the absolute path just in case the script is run from outside the directory
-    CONF_FILE="/home/pdev/hdd/auto-zip/.conf"
+    CONF_FILE="./.conf"
     if [ ! -f "$CONF_FILE" ]; then
         echo "Error: .conf file not found."
         exit 1
